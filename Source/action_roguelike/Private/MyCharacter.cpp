@@ -3,6 +3,7 @@
 #include "MyCharacter.h"
 
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 
 // Sets default values
@@ -12,10 +13,15 @@ AMyCharacter::AMyCharacter()
   PrimaryActorTick.bCanEverTick = true;
 
   MySpringArmComp = CreateDefaultSubobject<USpringArmComponent>("MySpringArmComp");
+  MySpringArmComp->bUsePawnControlRotation = true;
   MySpringArmComp->SetupAttachment( RootComponent );
 
   MyCameraComp = CreateDefaultSubobject<UCameraComponent>( "MyCameraComp" );
   MyCameraComp->SetupAttachment( MySpringArmComp );
+
+  GetCharacterMovement()->bOrientRotationToMovement = true;
+
+  bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +32,25 @@ void AMyCharacter::BeginPlay()
 
 void AMyCharacter::MoveForward( float Value )
 {
-  AddMovementInput(GetActorForwardVector(), Value);
+  FRotator ControlRot = GetControlRotation();
+  ControlRot.Pitch = 0.f;
+  ControlRot.Roll = 0.f;
+
+  AddMovementInput( ControlRot.Vector(), Value);
+}
+
+void AMyCharacter::MoveRight( float Value )
+{
+  FRotator ControlRot = GetControlRotation();
+  ControlRot.Pitch = 0.f;
+  ControlRot.Roll = 0.f;
+
+  // X = Forward (Red)
+  // Y = Right (Green)
+  // Z = Up (Blue)
+
+  FVector RightVector{ FRotationMatrix( ControlRot ).GetScaledAxis( EAxis::Y ) };
+  AddMovementInput( RightVector, Value );
 }
 
 // Called every frame
@@ -41,5 +65,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
   Super::SetupPlayerInputComponent( PlayerInputComponent );
 
   PlayerInputComponent->BindAxis( "MoveForward", this, &AMyCharacter::MoveForward );
+  PlayerInputComponent->BindAxis( "MoveRight", this, &AMyCharacter::MoveRight );
+
   PlayerInputComponent->BindAxis( "Turn", this, &APawn::AddControllerYawInput );
+  PlayerInputComponent->BindAxis( "LookUp", this, &APawn::AddControllerPitchInput );
 }
