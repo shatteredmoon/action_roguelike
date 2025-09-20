@@ -53,6 +53,11 @@ void AMyCharacter::MoveRight( float Value )
   AddMovementInput( RightVector, Value );
 }
 
+void AMyCharacter::Jump()
+{
+  ACharacter::Jump();
+}
+
 void AMyCharacter::PrimaryAttack()
 {
   FVector HandLocation{ GetMesh()->GetSocketLocation( "Muzzle_01" ) };
@@ -80,4 +85,5 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
   PlayerInputComponent->BindAxis( "LookUp", this, &APawn::AddControllerPitchInput );
 
   PlayerInputComponent->BindAction( "PrimaryAttack", IE_Pressed, this, &AMyCharacter::PrimaryAttack );
+  PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &AMyCharacter::Jump );
 }
