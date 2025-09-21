@@ -61,10 +61,19 @@ void AMyCharacter::Jump()
   ACharacter::Jump();
 }
 
+
 void AMyCharacter::PrimaryAttack()
 {
+  PlayAnimMontage( AttackAnim );
+
+  GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &AMyCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+  //GetWorldTimerManager().ClearTimer( TimerHandle_PrimaryAttack );
+}
+
+void AMyCharacter::PrimaryAttack_TimeElapsed()
+{
   FVector HandLocation{ GetMesh()->GetSocketLocation( "Muzzle_01" ) };
-  FTransform SpawnTM{ FTransform(GetControlRotation(), HandLocation) };
+  FTransform SpawnTM{ FTransform( GetControlRotation(), HandLocation ) };
   FActorSpawnParameters SpawnParams;
   SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
   GetWorld()->SpawnActor<AActor>( ProjectileClass, SpawnTM, SpawnParams );
