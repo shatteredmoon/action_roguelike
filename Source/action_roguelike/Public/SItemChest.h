@@ -12,7 +12,7 @@ class ACTION_ROGUELIKE_API ASItemChest : public AActor, public ISGameplayInterfa
 {
 	GENERATED_BODY()
 
-  void Interact_Implentation( APawn* instigatorPawn );
+  void Interact_Implementation( APawn* instigatorPawn );
 
 public:
 

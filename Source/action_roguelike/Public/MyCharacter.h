@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class USInteractionComponent;
 
 UCLASS()
 class ACTION_ROGUELIKE_API AMyCharacter : public ACharacter
@@ -30,6 +31,9 @@ protected:
   UPROPERTY( VisibleAnywhere )
   UCameraComponent* MyCameraComp;
 
+  UPROPERTY( VisibleAnywhere )
+  USInteractionComponent* InteractionComp;
+
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
 
@@ -38,6 +42,7 @@ protected:
 
   void Jump();
   void PrimaryAttack();
+  void PrimaryInteract();
 
 public:
   // Called every frame
