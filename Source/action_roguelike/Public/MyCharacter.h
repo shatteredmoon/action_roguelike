@@ -46,8 +46,6 @@ protected:
   void MoveForward( float Value );
   void MoveRight( float Value );
 
-  void Jump();
-
   void PrimaryAttack();
   void PrimaryAttack_TimeElapsed();
 
