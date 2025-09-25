@@ -66,12 +66,17 @@ void AMyCharacter::PrimaryAttack()
 
 void AMyCharacter::PrimaryAttack_TimeElapsed()
 {
-  FVector HandLocation{ GetMesh()->GetSocketLocation( "Muzzle_01" ) };
-  FTransform SpawnTM{ FTransform( GetControlRotation(), HandLocation ) };
-  FActorSpawnParameters SpawnParams;
-  SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-  SpawnParams.Instigator = this;
-  GetWorld()->SpawnActor<AActor>( ProjectileClass, SpawnTM, SpawnParams );
+  // if( check( ProjectileClass ) ) // fatal exception
+  // if( ensure( ProjectileClass ) ) // only triggers once
+  if( ensureAlways( ProjectileClass ) ) // triggers every time
+  {
+    FVector HandLocation{ GetMesh()->GetSocketLocation( "Muzzle_01" ) };
+    FTransform SpawnTM{ FTransform( GetControlRotation(), HandLocation ) };
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    SpawnParams.Instigator = this;
+    GetWorld()->SpawnActor<AActor>( ProjectileClass, SpawnTM, SpawnParams );
+  }
 }
 
 void AMyCharacter::PrimaryInteract()
