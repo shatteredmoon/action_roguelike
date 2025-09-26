@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-
+#include "SAttributeComponent.h"
 
 // Sets default values
 AMyMagicProjectile::AMyMagicProjectile()
@@ -23,6 +23,7 @@ AMyMagicProjectile::AMyMagicProjectile()
   // Method two, setting via profile name, defined in Project Settings->Collision->Preset
   // Note that the Projectile Preset was added manually, it's not a default Unreal Preset
   SphereComp->SetCollisionProfileName( "Projectile" );
+  SphereComp->OnComponentBeginOverlap.AddDynamic( this, &AMyMagicProjectile::OnActorOverlap );
   RootComponent = SphereComp;
 
   EffectComp = CreateDefaultSubobject<UParticleSystemComponent>( "EffectComp" );
@@ -32,6 +33,19 @@ AMyMagicProjectile::AMyMagicProjectile()
   MovementComp->InitialSpeed = 1000.f;
   MovementComp->bRotationFollowsVelocity = true;
   MovementComp->bInitialVelocityInLocalSpace = true;
+}
+
+void AMyMagicProjectile::OnActorOverlap( UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult )
+{
+  if( OtherActor )
+  {
+    USAttributeComponent* AttributeComp{ Cast< USAttributeComponent>(OtherActor->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
+    if( AttributeComp )
+    {
+      AttributeComp->ApplyHealthChange( -20.0f );
+      Destroy();
+    }
+  }
 }
 
 // Called when the game starts or when spawned
