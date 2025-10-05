@@ -2,37 +2,17 @@
 
 
 #include "MyMagicProjectile.h"
-#include "Components/SphereComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "SAttributeComponent.h"
+#include "Components/SphereComponent.h"
+
 
 // Sets default values
 AMyMagicProjectile::AMyMagicProjectile()
 {
-  // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-  PrimaryActorTick.bCanEverTick = true;
-
-  SphereComp = CreateDefaultSubobject<USphereComponent>( "SphereComp" );
-  
-  // Method one, setting collision info in code:
-  //SphereComp->SetCollisionObjectType( ECC_WorldDynamic );
-  //SphereComp->SetCollisionResponseToAllChannels( ECR_Ignore );
-  //SphereComp->SetCollisionResponseToChannel( ECC_Pawn, ECR_Overlap );
-
-  // Method two, setting via profile name, defined in Project Settings->Collision->Preset
-  // Note that the Projectile Preset was added manually, it's not a default Unreal Preset
-  SphereComp->SetCollisionProfileName( "Projectile" );
+  SphereComp->SetSphereRadius( 20.0f );
   SphereComp->OnComponentBeginOverlap.AddDynamic( this, &AMyMagicProjectile::OnActorOverlap );
-  RootComponent = SphereComp;
 
-  EffectComp = CreateDefaultSubobject<UParticleSystemComponent>( "EffectComp" );
-  EffectComp->SetupAttachment( SphereComp );
-
-  MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>( "MovementComp" );
-  MovementComp->InitialSpeed = 1000.f;
-  MovementComp->bRotationFollowsVelocity = true;
-  MovementComp->bInitialVelocityInLocalSpace = true;
+  DamageAmount = 20.0f;
 }
 
 void AMyMagicProjectile::OnActorOverlap( UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult )
@@ -42,20 +22,8 @@ void AMyMagicProjectile::OnActorOverlap( UPrimitiveComponent* OverlappedComponen
     USAttributeComponent* AttributeComp{ Cast< USAttributeComponent>(OtherActor->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
     if( AttributeComp )
     {
-      AttributeComp->ApplyHealthChange( -20.0f );
-      Destroy();
+      AttributeComp->ApplyHealthChange( -DamageAmount );
+      Explode();
     }
   }
-}
-
-// Called when the game starts or when spawned
-void AMyMagicProjectile::BeginPlay()
-{
-  Super::BeginPlay();
-}
-
-// Called every frame
-void AMyMagicProjectile::Tick( float DeltaTime )
-{
-  Super::Tick( DeltaTime );
 }
