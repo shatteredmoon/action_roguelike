@@ -31,6 +31,14 @@ AMyCharacter::AMyCharacter()
   AttackAnimDelay = 0.2f;
 }
 
+void AMyCharacter::PostInitializeComponents()
+{
+  Super::PostInitializeComponents();
+
+  // Trigger when health is changed (damage/healing)
+  AttributeComp->OnHealthChanged.AddDynamic( this, &AMyCharacter::OnHealthChanged );
+}
+
 void AMyCharacter::MoveForward( float Value )
 {
   FRotator ControlRot = GetControlRotation();
@@ -169,4 +177,13 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
   PlayerInputComponent->BindAction( "SecondaryAttack", IE_Pressed, this, &AMyCharacter::BlackHoleAttack );
   PlayerInputComponent->BindAction( "Dash", IE_Pressed, this, &AMyCharacter::Dash );
+}
+
+void AMyCharacter::OnHealthChanged( AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta )
+{
+  if( NewHealth <= 0.0f && Delta < 0.0f )
+  {
+    auto PC{ Cast<APlayerController>( GetController() ) };
+    DisableInput( PC );
+  }
 }
