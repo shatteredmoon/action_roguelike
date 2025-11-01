@@ -7,10 +7,11 @@
 #include "SGameplayInterface.h"
 #include "SItemChest.generated.h"
 
+
 UCLASS()
 class ACTION_ROGUELIKE_API ASItemChest : public AActor, public ISGameplayInterface
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
   void Interact_Implementation( APawn* instigatorPawn );
 
@@ -28,14 +29,6 @@ protected:
   UStaticMeshComponent* LidMesh;
 
 public:
-	// Sets default values for this actor's properties
-	ASItemChest();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+  // Sets default values for this actor's properties
+  ASItemChest();
 };

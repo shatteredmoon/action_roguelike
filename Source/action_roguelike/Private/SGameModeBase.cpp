@@ -6,6 +6,7 @@
 #include "AI/SAICharacter.h"
 #include "SAttributeComponent.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 
 
 ASGameModeBase::ASGameModeBase()
@@ -24,6 +25,42 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
+  int32 NumAliveBots{ 0 };
+  for( TActorIterator<ASAICharacter> Iter( GetWorld() ); Iter; ++Iter )
+  {
+    ASAICharacter* Bot{ *Iter };
+    auto* AttributeComp{ Cast< USAttributeComponent>( Bot->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
+    if( ensure( AttributeComp ) && AttributeComp->IsAlive() )
+    {
+      ++NumAliveBots;
+    }
+  }
+
+  /*int32 NumAliveBots = 0;
+  for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
+  {
+    USAttributeComponent* AIAttributeComp = USAttributeComponent::GetAttributeComp( Bot );
+    if( ensure( AIAttributeComp ) && AIAttributeComp->IsAlive() )
+    {
+      ++NumAliveBots;
+    }
+  }*/
+
+  UE_LOG( LogTemp, Log, TEXT( "Found %i alive bots." ), NumAliveBots );
+
+  float MaxBotCount{ 10.0f };
+
+  if( DifficultyCurve )
+  {
+    MaxBotCount = DifficultyCurve->GetFloatValue( GetWorld()->TimeSeconds );
+  }
+
+  if( NumAliveBots >= MaxBotCount )
+  {
+    UE_LOG( LogTemp, Log, TEXT( "At maximum bot capacity. Skipping bot spawn." ) );
+    return;
+  }
+
   UEnvQueryInstanceBlueprintWrapper* QueryInstance{ UEnvQueryManager::RunEQSQuery( this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr ) };
   if( ensure( QueryInstance ) )
   {
@@ -39,42 +76,12 @@ void ASGameModeBase::OnQueryCompleted( UEnvQueryInstanceBlueprintWrapper* QueryI
     return;
   }
 
-  int32 NumAliveBots{ 0 };
-  for( TActorIterator<ASAICharacter> Iter( GetWorld() ); Iter; ++Iter )
-  {
-    ASAICharacter* Bot{ *Iter };
-    auto* AttributeComp{ Cast< USAttributeComponent>( Bot->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
-    if( AttributeComp && AttributeComp->IsAlive() )
-    {
-      ++NumAliveBots;
-    }
-  }
-
-  /*int32 NumOfAliveBots = 0;
-  for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
-  {
-    USAttributeComponent* AIAttributeComp = USAttributeComponent::GetAttributeComp( Bot );
-    if( ensure( AIAttributeComp ) && AIAttributeComp->IsAlive() )
-    {
-      ++NumOfAliveBots;
-    }
-  }*/
-
-  float MaxBotCount{ 10.0f };
-
-  if( DifficultyCurve )
-  {
-    MaxBotCount = DifficultyCurve->GetFloatValue( GetWorld()->TimeSeconds );
-  }
-
-  if( NumAliveBots >= MaxBotCount )
-  {
-    return;
-  }
-
   TArray<FVector> Locations{ QueryInstance->GetResultsAsLocations() };
   if( Locations.IsValidIndex(0) )
   {
     GetWorld()->SpawnActor<AActor>( MinionClass, Locations[0], FRotator::ZeroRotator );
+
+    // Track all the used spawn locations
+    DrawDebugSphere( GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f );
   }
 }
