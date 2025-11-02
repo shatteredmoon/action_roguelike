@@ -32,6 +32,9 @@ protected:
   UFUNCTION()
   void OnPawnSeen( APawn* Pawn );
 
+  UFUNCTION()
+  void SetTargetActor( AActor* NewTarget );
+
   void PostInitializeComponents() override;
 
 public:
