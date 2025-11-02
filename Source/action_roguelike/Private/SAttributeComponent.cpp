@@ -12,6 +12,24 @@ USAttributeComponent::USAttributeComponent()
 }
 
 
+USAttributeComponent* USAttributeComponent::GetAttributes( AActor* FromActor )
+{
+  if( FromActor )
+  {
+    return FromActor->FindComponentByClass<USAttributeComponent>();
+  }
+
+  return nullptr;
+}
+
+
+bool USAttributeComponent::IsActorAlive( AActor* Actor )
+{
+  USAttributeComponent* AttributeComp{ GetAttributes( Actor ) };
+  return AttributeComp ? AttributeComp->IsAlive() : false;
+}
+
+
 bool USAttributeComponent::IsFullHealth() const
 {
   return Health == HealthMax;

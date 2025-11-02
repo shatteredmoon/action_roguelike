@@ -12,11 +12,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams( FOnHealthChanged, AActor*, Instig
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTION_ROGUELIKE_API USAttributeComponent : public UActorComponent
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
-	USAttributeComponent();
+  // Sets default values for this component's properties
+  USAttributeComponent();
+
+  UFUNCTION( BlueprintCallable, Category = "Attributes" )
+  static USAttributeComponent* GetAttributes( AActor* FromActor );
+
+  UFUNCTION( BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive" ))
+  static bool IsActorAlive(AActor* Actor);
 
 protected:
 

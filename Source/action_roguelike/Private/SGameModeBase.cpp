@@ -26,25 +26,14 @@ void ASGameModeBase::StartPlay()
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
   int32 NumAliveBots{ 0 };
-  for( TActorIterator<ASAICharacter> Iter( GetWorld() ); Iter; ++Iter )
+  for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
   {
-    ASAICharacter* Bot{ *Iter };
-    auto* AttributeComp{ Cast< USAttributeComponent>( Bot->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
+    auto* AttributeComp{ USAttributeComponent::GetAttributes( Bot ) };
     if( ensure( AttributeComp ) && AttributeComp->IsAlive() )
     {
       ++NumAliveBots;
     }
   }
-
-  /*int32 NumAliveBots = 0;
-  for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
-  {
-    USAttributeComponent* AIAttributeComp = USAttributeComponent::GetAttributeComp( Bot );
-    if( ensure( AIAttributeComp ) && AIAttributeComp->IsAlive() )
-    {
-      ++NumAliveBots;
-    }
-  }*/
 
   UE_LOG( LogTemp, Log, TEXT( "Found %i alive bots." ), NumAliveBots );
 
