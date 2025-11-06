@@ -23,6 +23,19 @@ void ASGameModeBase::StartPlay()
 }
 
 
+void ASGameModeBase::KillAll()
+{
+  for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
+  {
+    auto* AttributeComp{ USAttributeComponent::GetAttributes( Bot ) };
+    if( ensure( AttributeComp ) && AttributeComp->IsAlive() )
+    {
+      AttributeComp->Kill( this ); // @fixme: pass in player for kill credit?
+    }
+  }
+}
+
+
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
   int32 NumAliveBots{ 0 };

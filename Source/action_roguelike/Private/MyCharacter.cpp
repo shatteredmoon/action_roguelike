@@ -155,10 +155,12 @@ void AMyCharacter::SpawnProjectile( TSubclassOf<AActor> ClassToSpawn )
   }
 }
 
+
 void AMyCharacter::PrimaryInteract()
 {
   InteractionComp->PrimaryInteract();
 }
+
 
 // Called to bind functionality to input
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -178,6 +180,13 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
   PlayerInputComponent->BindAction( "SecondaryAttack", IE_Pressed, this, &AMyCharacter::BlackHoleAttack );
   PlayerInputComponent->BindAction( "Dash", IE_Pressed, this, &AMyCharacter::Dash );
 }
+
+
+void AMyCharacter::HealSelf( float Amount /* = 100 */ )
+{
+  AttributeComp->ApplyHealthChange( this, Amount );
+}
+
 
 void AMyCharacter::OnHealthChanged( AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta )
 {
