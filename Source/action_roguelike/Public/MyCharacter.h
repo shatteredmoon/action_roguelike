@@ -79,6 +79,8 @@ protected:
 
   void PostInitializeComponents() override;
 
+  FVector GetPawnViewLocation() const override;
+
 public:
 
   // Called to bind functionality to input

@@ -4,6 +4,7 @@
 #include "MyMagicProjectile.h"
 #include "SAttributeComponent.h"
 #include "Components/SphereComponent.h"
+#include "SGameplayFunctionLibrary.h"
 
 
 // Sets default values
@@ -19,10 +20,15 @@ void AMyMagicProjectile::OnActorOverlap( UPrimitiveComponent* OverlappedComponen
 {
   if( OtherActor && OtherActor != GetInstigator() )
   {
-    USAttributeComponent* AttributeComp{ Cast< USAttributeComponent>(OtherActor->GetComponentByClass( USAttributeComponent::StaticClass() ) ) };
+    /*USAttributeComponent* AttributeComp{Cast< USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()))};
     if( AttributeComp )
     {
       AttributeComp->ApplyHealthChange( GetInstigator(), - DamageAmount);
+      Explode();
+    }*/
+
+    if( USGameplayFunctionLibrary::ApplyDirectionalDamage( GetInstigator(), OtherActor, DamageAmount, SweepResult ) )
+    {
       Explode();
     }
   }
