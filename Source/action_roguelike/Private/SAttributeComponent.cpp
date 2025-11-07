@@ -3,6 +3,8 @@
 #include "SAttributeComponent.h"
 #include "SGameModeBase.h"
 
+static TAutoConsoleVariable<float> CVarDamageMultiplier( TEXT( "su.DamageMultiplier" ), 1.0f, TEXT( "Global Damage Modifier for Attribute Component." ), ECVF_Cheat );
+
 
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
@@ -54,6 +56,12 @@ bool USAttributeComponent::ApplyHealthChange( AActor* InstigatorActor, float Del
   if( GetOwner()->CanBeDamaged() )
   {
     return false;
+  }
+
+  if( Delta < 0.0f )
+  {
+    const float DamageMultiplier{ CVarDamageMultiplier.GetValueOnGameThread() };
+    Delta *= DamageMultiplier;
   }
 
   float OldHealth = Health;

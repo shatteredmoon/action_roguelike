@@ -9,6 +9,9 @@
 #include "DrawDebugHelpers.h"
 #include "MyCharacter.h"
 
+// Cheats are not included in the final build
+static TAutoConsoleVariable<bool> CVarSpawnBots( TEXT( "su.SpawnBots" ), true, TEXT( "Enable spawning of bots via timer" ), ECVF_Cheat );
+
 
 ASGameModeBase::ASGameModeBase()
 {
@@ -56,6 +59,12 @@ void ASGameModeBase::KillAll()
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
+  if( !CVarSpawnBots.GetValueOnGameThread() )
+  {
+    UE_LOG( LogTemp, Warning, TEXT( "Bot spawning disabled via cvar 'CVarSpawnBots'." ) );
+    return;
+  }
+
   int32 NumAliveBots{ 0 };
   for( ASAICharacter* Bot : TActorRange<ASAICharacter>( GetWorld() ) )
   {
