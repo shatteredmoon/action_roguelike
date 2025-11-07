@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SAttributeComponent.h"
+#include "SGameModeBase.h"
 
 
 // Sets default values for this component's properties
@@ -61,6 +62,15 @@ bool USAttributeComponent::ApplyHealthChange( AActor* InstigatorActor, float Del
 
   float ActualDelta = Health - OldHealth;
   OnHealthChanged.Broadcast( InstigatorActor, this, Health, ActualDelta );
+
+  // Died
+  if( ActualDelta < 0.0f && Health == 0.0f )
+  {
+    if( ASGameModeBase* GM{ ( GetWorld()->GetAuthGameMode<ASGameModeBase>() ) } )
+    {
+      GM->OnActorKilled( GetOwner(), InstigatorActor );
+    }
+  }
 
   return ActualDelta != 0;
 }

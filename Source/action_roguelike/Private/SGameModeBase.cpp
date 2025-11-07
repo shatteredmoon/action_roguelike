@@ -7,11 +7,29 @@
 #include "SAttributeComponent.h"
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
+#include "MyCharacter.h"
 
 
 ASGameModeBase::ASGameModeBase()
 {
   SpawnTimerInterval = 2.0f;
+}
+
+
+void ASGameModeBase::OnActorKilled( AActor* VictimActor, AActor* Killer )
+{
+  if( AMyCharacter* Player{ Cast<AMyCharacter>( VictimActor ) } )
+  {
+    FTimerHandle TimerHandle_RespawnDelay;
+
+    FTimerDelegate Delegate;
+    Delegate.BindUFunction( this, "RespawnPlayerElapsed", Player->GetController() );
+
+    constexpr float RespawnDelay{ 2.0f };
+    GetWorldTimerManager().SetTimer( TimerHandle_RespawnDelay, Delegate, RespawnDelay, false );
+  }
+
+  UE_LOG( LogTemp, Log, TEXT( "OnActorKilled: Victim: %s, Killer: %s" ), *GetNameSafe( VictimActor ), *GetNameSafe( Killer ) );
 }
 
 
@@ -85,5 +103,14 @@ void ASGameModeBase::OnQueryCompleted( UEnvQueryInstanceBlueprintWrapper* QueryI
 
     // Track all the used spawn locations
     DrawDebugSphere( GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f );
+  }
+}
+
+void ASGameModeBase::RespawnPlayerElapsed( AController* Controller )
+{
+  if( ensure( Controller ) )
+  {
+    Controller->UnPossess();
+    RestartPlayer( Controller );
   }
 }

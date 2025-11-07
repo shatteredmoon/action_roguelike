@@ -7,10 +7,11 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "SGameModeBase.generated.h"
 
-
+class AController;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+
 
 /**
  * 
@@ -42,9 +43,14 @@ protected:
   UFUNCTION()
   void OnQueryCompleted( UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
+  UFUNCTION()
+  void RespawnPlayerElapsed( AController* Controller );
+
 public:
 
   ASGameModeBase();
+
+  virtual void OnActorKilled( AActor* VictimActor, AActor* Killer );
 
   void StartPlay() override;
 
