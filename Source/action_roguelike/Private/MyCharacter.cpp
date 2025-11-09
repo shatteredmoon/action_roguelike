@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "SInteractionComponent.h"
 #include "SAttributeComponent.h"
+#include "SActionComponent.h"
+
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -24,6 +26,8 @@ AMyCharacter::AMyCharacter()
   InteractionComp = CreateDefaultSubobject<USInteractionComponent>( "InteractionComp" );
 
   AttributeComp = CreateDefaultSubobject<USAttributeComponent>( "AttributeComp" );
+
+  ActionComp = CreateDefaultSubobject<USActionComponent>( "ActionComp" );
 
   GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -68,6 +72,19 @@ void AMyCharacter::MoveRight( float Value )
   FVector RightVector{ FRotationMatrix( ControlRot ).GetScaledAxis( EAxis::Y ) };
   AddMovementInput( RightVector, Value );
 }
+
+
+void AMyCharacter::SprintStart()
+{
+  ActionComp->StartActionByName( this, "Sprint" );
+}
+
+
+void AMyCharacter::SprintStop()
+{
+  ActionComp->StopActionByName( this, "Sprint" );
+}
+
 
 void AMyCharacter::PrimaryAttack()
 {
@@ -186,6 +203,9 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
   PlayerInputComponent->BindAction( "SecondaryAttack", IE_Pressed, this, &AMyCharacter::BlackHoleAttack );
   PlayerInputComponent->BindAction( "Dash", IE_Pressed, this, &AMyCharacter::Dash );
+
+  PlayerInputComponent->BindAction( "Sprint", IE_Pressed, this, &AMyCharacter::SprintStart );
+  PlayerInputComponent->BindAction( "Sprint", IE_Released, this, &AMyCharacter::SprintStop );
 }
 
 

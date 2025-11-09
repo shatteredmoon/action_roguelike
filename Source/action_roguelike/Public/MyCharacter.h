@@ -11,6 +11,8 @@ class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class USActionComponent;
+
 
 UCLASS()
 class ACTION_ROGUELIKE_API AMyCharacter : public ACharacter
@@ -55,8 +57,14 @@ protected:
   UPROPERTY( VisibleAnywhere, BlueprintReadOnly, Category = "Components")
   USAttributeComponent* AttributeComp;
 
+  UPROPERTY( VisibleAnywhere, BlueprintReadOnly, Category = "Components" )
+  USActionComponent* ActionComp;
+
   void MoveForward( float Value );
   void MoveRight( float Value );
+
+  void SprintStart();
+  void SprintStop();
 
   void PrimaryAttack();
   void PrimaryAttack_TimeElapsed();
