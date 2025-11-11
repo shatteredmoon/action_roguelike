@@ -63,6 +63,11 @@ bool USActionComponent::StopActionByName( AActor* Instigator, FName ActionName )
 void USActionComponent::BeginPlay()
 {
   Super::BeginPlay();
+
+  for( TSubclassOf<USAction> ActionClass : DefaultActions )
+  {
+    AddAction( ActionClass );
+  }
 }
 
 

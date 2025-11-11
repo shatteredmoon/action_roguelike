@@ -19,31 +19,11 @@ class ACTION_ROGUELIKE_API AMyCharacter : public ACharacter
 {
   GENERATED_BODY()
 
-protected:
-  UPROPERTY( EditAnywhere, Category = "Attack" )
-  TSubclassOf<AActor> ProjectileClass;
-
-  UPROPERTY( EditAnywhere, Category = "Attack" )
-  TSubclassOf<AActor> BlackHoleProjectileClass;
-
-  UPROPERTY( EditAnywhere, Category = "Attack" )
-  TSubclassOf<AActor> DashProjectileClass;
-
-  UPROPERTY( EditAnywhere, Category = "Attack" )
-  UAnimMontage* AttackAnim;
-
-  FTimerHandle TimerHandle_PrimaryAttack;
-  FTimerHandle TimerHandle_BlackholeAttack;
-  FTimerHandle TimerHandle_Dash;
-
 public:
   // Sets default values for this character's properties
   AMyCharacter();
 
 protected:
-
-  UPROPERTY( EditDefaultsOnly, Category = "Attack" )
-  float AttackAnimDelay;
 
   UPROPERTY(VisibleAnywhere)
   USpringArmComponent* SpringArmComp;
@@ -67,18 +47,8 @@ protected:
   void SprintStop();
 
   void PrimaryAttack();
-  void PrimaryAttack_TimeElapsed();
-
   void BlackHoleAttack();
-
-  void BlackholeAttack_TimeElapsed();
-
   void Dash();
-
-  void Dash_TimeElapsed();
-
-  // Re-use spawn logic between attacks
-  void SpawnProjectile( TSubclassOf<AActor> ClassToSpawn );
 
   void PrimaryInteract();
 

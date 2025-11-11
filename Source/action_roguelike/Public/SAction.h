@@ -7,6 +7,7 @@
 #include "SAction.generated.h"
 
 class AActor;
+class UWorld;
 
 
 /**
@@ -27,4 +28,6 @@ public:
 
   UPROPERTY( EditDefaultsOnly, Category = "Actions" );
   FName ActionName;
+
+  UWorld* GetWorld() const override;
 };
