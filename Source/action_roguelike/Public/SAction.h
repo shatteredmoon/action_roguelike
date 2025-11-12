@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "SAction.generated.h"
 
 class AActor;
 class UWorld;
+class USActionComponent;
 
 
 /**
@@ -18,15 +20,27 @@ class ACTION_ROGUELIKE_API USAction : public UObject
 {
   GENERATED_BODY()
 
+protected:
+
+  UFUNCTION( BlueprintCallable, Category = "Action" )
+  USActionComponent* GetOwningComponent() const;
+
+
+  UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
+  FGameplayTagContainer GrantsTags;
+
+  UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
+  FGameplayTagContainer BlockedTags;
+
 public:
 
-  UFUNCTION( BlueprintNativeEvent, Category = "Actions" )
+  UFUNCTION( BlueprintNativeEvent, Category = "Action" )
   void StartAction( AActor* Instigator );
 
-  UFUNCTION( BlueprintNativeEvent, Category = "Actions" )
+  UFUNCTION( BlueprintNativeEvent, Category = "Action" )
   void StopAction( AActor* Instigator );
 
-  UPROPERTY( EditDefaultsOnly, Category = "Actions" );
+  UPROPERTY( EditDefaultsOnly, Category = "Action" );
   FName ActionName;
 
   UWorld* GetWorld() const override;
