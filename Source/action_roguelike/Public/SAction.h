@@ -32,7 +32,15 @@ protected:
   UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
   FGameplayTagContainer BlockedTags;
 
+  bool bIsRunning{ false };
+
 public:
+
+  UFUNCTION( BlueprintCallable, Category = "Action" )
+  bool IsRunning() const;
+
+  UFUNCTION( BlueprintNativeEvent, Category = "Action" )
+  bool CanStart( AActor* Instigator );
 
   UFUNCTION( BlueprintNativeEvent, Category = "Action" )
   void StartAction( AActor* Instigator );
