@@ -5,6 +5,8 @@
 #include "SAttributeComponent.h"
 #include "Components/SphereComponent.h"
 #include "SGameplayFunctionLibrary.h"
+#include "SActionComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 
 // Sets default values
@@ -27,6 +29,15 @@ void AMyMagicProjectile::OnActorOverlap( UPrimitiveComponent* OverlappedComponen
       Explode();
     }*/
 
+    USActionComponent* ActionComp{ Cast<USActionComponent>( OtherActor->GetComponentByClass( USActionComponent::StaticClass() ) ) };
+    if( ActionComp && ActionComp->ActiveGameplayTags.HasTag( ParryTag ) )
+    {
+      MovementComp->Velocity = -MovementComp->Velocity;
+      SetInstigator( Cast<APawn>( OtherActor ) );
+      return;
+    }
+
+    // Apply Damage & Impulse
     if( USGameplayFunctionLibrary::ApplyDirectionalDamage( GetInstigator(), OtherActor, DamageAmount, SweepResult ) )
     {
       Explode();

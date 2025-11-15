@@ -11,13 +11,16 @@
 #include "SWorldUserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "SActionComponent.h"
 
 
 // Sets default values
 ASAICharacter::ASAICharacter()
 {
   PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>( "PawnSensingComp" );
-  AttributeComp = CreateDefaultSubobject<USAttributeComponent>( "AttriuteComp" );
+  AttributeComp = CreateDefaultSubobject<USAttributeComponent>( "AttributeComp" );
+
+  ActionComp = CreateDefaultSubobject<USActionComponent>( "ActionComp" );
 
   AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
@@ -25,6 +28,8 @@ ASAICharacter::ASAICharacter()
   GetMesh()->SetGenerateOverlapEvents( true );
 
   TimeToHitParamName = "TimeToHit";
+
+
 }
 
 
