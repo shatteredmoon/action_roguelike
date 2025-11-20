@@ -4,17 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "SPowerupActor.h"
-#include "SPowerup_HealthPotion.generated.h"
-
+#include "SPowerup_Credits.generated.h"
 
 class UStaticMeshComponent;
-
 
 /**
  *
  */
 UCLASS()
-class ACTION_ROGUELIKE_API ASPowerup_HealthPotion : public ASPowerupActor
+class ACTION_ROGUELIKE_API ASPowerup_Credits : public ASPowerupActor
 {
   GENERATED_BODY()
 
@@ -23,12 +21,12 @@ protected:
   UPROPERTY( VisibleAnywhere, Category = "Components" )
   UStaticMeshComponent* MeshComp;
 
-  UPROPERTY( EditAnywhere, Category = "HealthPotion" )
-  int32 CreditCost;
+  UPROPERTY( EditAnywhere, Category = "Credits" )
+  int32 CreditsAmount;
 
 public:
 
   void Interact_Implementation( APawn* InstigatorPawn ) override;
 
-  ASPowerup_HealthPotion();
+  ASPowerup_Credits();
 };
