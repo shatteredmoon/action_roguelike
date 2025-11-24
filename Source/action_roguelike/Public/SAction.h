@@ -26,15 +26,21 @@ protected:
   USActionComponent* GetOwningComponent() const;
 
 
+  // Tags added to owning actor when activated, removed when action stops
   UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
   FGameplayTagContainer GrantsTags;
 
+  // Action can only start if OwningActor has none of these tags applied
   UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
   FGameplayTagContainer BlockedTags;
 
   bool bIsRunning{ false };
 
 public:
+
+  // Start immediately when added to an action component
+  UPROPERTY( EditDefaultsOnly, Category = "Action" )
+  bool bAutoStart{ false };
 
   UFUNCTION( BlueprintCallable, Category = "Action" )
   bool IsRunning() const;
