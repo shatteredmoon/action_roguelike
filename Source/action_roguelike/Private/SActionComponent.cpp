@@ -11,6 +11,14 @@ USActionComponent::USActionComponent()
   // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
   // off to improve performance if you don't need them.
   PrimaryComponentTick.bCanEverTick = true;
+
+  SetIsReplicatedByDefault( true );
+}
+
+
+void USActionComponent::ServerStartAction_Implementation( AActor* Instigator, FName ActionName )
+{
+  StartActionByName( Instigator, ActionName );
 }
 
 
@@ -56,6 +64,12 @@ bool USActionComponent::StartActionByName( AActor* Instigator, FName ActionName 
         FString FailedMsg( FString::Printf( TEXT( "Failed to run: %s" ), *ActionName.ToString() ) );
         GEngine->AddOnScreenDebugMessage( -1, 2.0f, FColor::Red, FailedMsg );
         continue;
+      }
+
+      // Is Client?
+      if( GetOwner()->HasAuthority() )
+      {
+        ServerStartAction( Instigator, ActionName );
       }
 
       Action->StartAction( Instigator );

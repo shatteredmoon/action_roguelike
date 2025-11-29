@@ -13,7 +13,7 @@ class USAction;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTION_ROGUELIKE_API USActionComponent : public UActorComponent
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
 public:
 
@@ -36,6 +36,9 @@ public:
   USActionComponent();
 
 protected:
+
+  UFUNCTION(Server, Reliable)
+  void ServerStartAction( AActor* Instigator, FName ActionName );
 
   UPROPERTY()
   TArray<USAction*> Actions;
