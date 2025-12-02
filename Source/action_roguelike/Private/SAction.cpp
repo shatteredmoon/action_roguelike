@@ -4,11 +4,22 @@
 #include "SAction.h"
 #include "SActionComponent.h"
 #include "../action_roguelike.h"
+#include "Net/UnrealNetwork.h"
+
+
+void USAction::Initialize( USActionComponent* NewActionComp )
+{
+  ActionComp = NewActionComp;
+}
 
 
 USActionComponent* USAction::GetOwningComponent() const
 {
-  return Cast<USActionComponent>( GetOuter() );
+  //AActor* Actor{ Cast<AActor>( GetOuter() ) };
+  //return Actor->GetComponentByClass( USActionComponent::StaticClass() );
+
+  //return Cast<USActionComponent>( GetOuter() );
+  return ActionComp;
 }
 
 
@@ -46,7 +57,7 @@ void USAction::StopAction_Implementation( AActor* Instigator )
   //UE_LOG( LogTemp, Log, TEXT( "Stopped: %s" ), *GetNameSafe( this ) );
   LogOnScreen( this, FString::Printf( TEXT( "Stopped: %s" ), *ActionName.ToString() ), FColor::White );
 
-  ensureAlways( bIsRunning );
+  //ensureAlways( bIsRunning );
 
   USActionComponent* Comp{ GetOwningComponent() };
   Comp->ActiveGameplayTags.RemoveTags( GrantsTags );
@@ -58,16 +69,37 @@ void USAction::StopAction_Implementation( AActor* Instigator )
 UWorld* USAction::GetWorld() const
 {
   // Outer has been set to new object
-  if( UActorComponent * Comp{ Cast<UActorComponent>( GetOuter() ) } )
+  if( AActor* Actor{ Cast<AActor>( GetOuter() ) } )
   {
-    return Comp->GetWorld();
+    return Actor->GetWorld();
   }
 
   return nullptr;
 }
 
 
+void USAction::OnRep_IsRunning()
+{
+  if( bIsRunning )
+  {
+    StartAction( nullptr );
+  }
+  else
+  {
+    StopAction( nullptr );
+  }
+}
+
+
 bool USAction::IsRunning() const
 {
   return bIsRunning;
+}
+
+
+void USAction::GetLifetimeReplicatedProps( TArray<class FLifetimeProperty>& OutLifetimeProps ) const
+{
+  Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+  DOREPLIFETIME( USAction, bIsRunning );
+  DOREPLIFETIME( USAction, ActionComp );
 }

@@ -40,7 +40,7 @@ protected:
   UFUNCTION(Server, Reliable)
   void ServerStartAction( AActor* Instigator, FName ActionName );
 
-  UPROPERTY()
+  UPROPERTY(Replicated)
   TArray<USAction*> Actions;
 
   /* Granted abilities at game start */
@@ -48,10 +48,12 @@ protected:
   TArray<TSubclassOf<USAction>> DefaultActions;
 
   // Called when the game starts
-  virtual void BeginPlay() override;
+  void BeginPlay() override;
 
 public:
 
+  bool ReplicateSubobjects( class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags ) override;
+
   // Called every frame
-  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+  void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

@@ -22,6 +22,9 @@ class ACTION_ROGUELIKE_API USAction : public UObject
 
 protected:
 
+  UPROPERTY( Replicated )
+  USActionComponent* ActionComp;
+
   UFUNCTION( BlueprintCallable, Category = "Action" )
   USActionComponent* GetOwningComponent() const;
 
@@ -34,9 +37,20 @@ protected:
   UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
   FGameplayTagContainer BlockedTags;
 
+  UPROPERTY( ReplicatedUsing = "OnRep_IsRunning" )
   bool bIsRunning{ false };
 
+  UFUNCTION()
+  void OnRep_IsRunning();
+
+  bool IsSupportedForNetworking() const override
+  {
+    return true;
+  }
+
 public:
+
+  void Initialize( USActionComponent* NewActionComp );
 
   // Start immediately when added to an action component
   UPROPERTY( EditDefaultsOnly, Category = "Action" )

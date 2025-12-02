@@ -4,6 +4,8 @@
 #include "SActionComponent.h"
 #include "SAction.h"
 #include "../action_roguelike.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/ActorChannel.h"
 
 
 // Sets default values for this component's properties
@@ -30,9 +32,11 @@ void USActionComponent::AddAction( AActor* Instigator, TSubclassOf<USAction> Act
     return;
   }
 
-  USAction* NewAction{ NewObject<USAction>( this, ActionClass ) };
+  USAction* NewAction{ NewObject<USAction>( GetOwner(), ActionClass)};
   if( ensure( NewAction ) )
   {
+    NewAction->Initialize( this );
+
     Actions.Add( NewAction );
 
     if( NewAction->bAutoStart && ensure( NewAction->CanStart( Instigator ) ) )
@@ -105,9 +109,12 @@ void USActionComponent::BeginPlay()
 {
   Super::BeginPlay();
 
-  for( TSubclassOf<USAction> ActionClass : DefaultActions )
+  if( GetOwner()->HasAuthority() )
   {
-    AddAction( GetOwner(), ActionClass );
+    for( TSubclassOf<USAction> ActionClass : DefaultActions )
+    {
+      AddAction( GetOwner(), ActionClass );
+    }
   }
 }
 
@@ -129,8 +136,30 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
                                         *GetNameSafe( GetOwner() ),
                                         *Action->ActionName.ToString(),
                                         Action->IsRunning() ? TEXT( "true" ) : TEXT( "false" ),
-                                        *GetNameSafe( GetOuter() ) ) };
+                                        *GetNameSafe( Action->GetOuter() ) ) };
 
     LogOnScreen( this, ActionMsg, TextColor, 0.0f );
   }
+}
+
+
+bool USActionComponent::ReplicateSubobjects( UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags )
+{
+  bool bWroteSomething{ Super::ReplicateSubobjects( Channel, Bunch, RepFlags ) };
+  for( USAction* Action : Actions )
+  {
+    if( Action )
+    {
+      bWroteSomething |= Channel->ReplicateSubobject( Action, *Bunch, *RepFlags );
+    }
+  }
+
+  return bWroteSomething;
+}
+
+
+void USActionComponent::GetLifetimeReplicatedProps( TArray<class FLifetimeProperty>& OutLifetimeProps ) const
+{
+  Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+  DOREPLIFETIME( USActionComponent, Actions );
 }
