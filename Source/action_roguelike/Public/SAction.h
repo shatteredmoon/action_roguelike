@@ -12,6 +12,21 @@ class UWorld;
 class USActionComponent;
 
 
+USTRUCT()
+struct FActionRepData
+{
+  GENERATED_BODY()
+
+  public:
+
+    UPROPERTY()
+    bool bIsRunning;
+
+    UPROPERTY() // Use NOT_REPLICATED if you don't want something to replicate in structs
+    AActor* Instigator;
+};
+
+
 /**
  * 
  */
@@ -37,11 +52,11 @@ protected:
   UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Tags" )
   FGameplayTagContainer BlockedTags;
 
-  UPROPERTY( ReplicatedUsing = "OnRep_IsRunning" )
-  bool bIsRunning{ false };
+  UPROPERTY( ReplicatedUsing = "OnRep_RepData" )
+  FActionRepData RepData;
 
   UFUNCTION()
-  void OnRep_IsRunning();
+  void OnRep_RepData();
 
   bool IsSupportedForNetworking() const override
   {
