@@ -25,10 +25,23 @@ void USActionComponent::ServerStartAction_Implementation( AActor* Instigator, FN
 }
 
 
+void USActionComponent::ServerStopAction_Implementation( AActor* Instigator, FName ActionName )
+{
+  StopActionByName( Instigator, ActionName );
+}
+
+
 void USActionComponent::AddAction( AActor* Instigator, TSubclassOf<USAction> ActionClass )
 {
   if( !ensure( ActionClass ) )
   {
+    return;
+  }
+
+  // Skip for clients
+  if( !GetOwner()->HasAuthority() )
+  {
+    UE_LOG( LogTemp, Warning, TEXT( "Client attempting to AddAction. [Class: %s]" ), *GetNameSafe( ActionClass ) );
     return;
   }
 
@@ -94,6 +107,12 @@ bool USActionComponent::StopActionByName( AActor* Instigator, FName ActionName )
     {
       if( Action->IsRunning() )
       {
+        // Is Client?
+        if( GetOwner()->HasAuthority() )
+        {
+          ServerStopAction( Instigator, ActionName );
+        }
+
         Action->StopAction( Instigator );
         return true;
       }
