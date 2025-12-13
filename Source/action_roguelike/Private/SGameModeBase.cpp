@@ -9,6 +9,8 @@
 #include "DrawDebugHelpers.h"
 #include "MyCharacter.h"
 #include "SPlayerState.h"
+#include "SSaveGame.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Cheats are not included in the final build
@@ -25,6 +27,16 @@ ASGameModeBase::ASGameModeBase()
   RequiredPowerupDistance = 2000;
 
   PlayerStateClass = ASPlayerState::StaticClass();
+
+  SlotName = "SaveGame01";
+}
+
+
+void ASGameModeBase::InitGame( const FString& MapName, const FString& Options, FString& ErrorMessage )
+{
+  Super::InitGame( MapName, Options, ErrorMessage );
+
+  LoadSaveGame();
 }
 
 
@@ -217,5 +229,37 @@ void ASGameModeBase::RespawnPlayerElapsed( AController* Controller )
   {
     Controller->UnPossess();
     RestartPlayer( Controller );
+  }
+}
+
+
+void ASGameModeBase::WriteSaveGame()
+{
+  constexpr int32 playerIndex{ 0 };
+
+  UGameplayStatics::SaveGameToSlot( CurrentSaveGame, SlotName, playerIndex );
+}
+
+
+void ASGameModeBase::LoadSaveGame()
+{
+  constexpr int32 playerIndex{ 0 };
+
+  if( UGameplayStatics::DoesSaveGameExist( SlotName, playerIndex ) )
+  {
+    CurrentSaveGame = Cast<USSaveGame>( UGameplayStatics::LoadGameFromSlot( SlotName, playerIndex ) );
+    if( CurrentSaveGame == nullptr )
+    {
+      UE_LOG( LogTemp, Warning, TEXT( "Failed to load SaveGame Data." ) );
+      return;
+    }
+
+    UE_LOG( LogTemp, Warning, TEXT( "Loaded SaveGame Data." ) );
+  }
+  else
+  {
+    CurrentSaveGame = Cast<USSaveGame>( UGameplayStatics::CreateSaveGameObject( USSaveGame::StaticClass() ) );
+
+    UE_LOG( LogTemp, Warning, TEXT( "Created new SaveGame Data." ) );
   }
 }
