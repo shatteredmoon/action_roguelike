@@ -11,6 +11,7 @@
 #include "SPlayerState.h"
 #include "SSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
 
 
 // Cheats are not included in the final build
@@ -87,6 +88,18 @@ void ASGameModeBase::StartPlay()
     {
       QueryInstance->GetOnQueryFinishedEvent().AddDynamic( this, &ASGameModeBase::OnBotSpawnQueryCompleted );
     }
+  }
+}
+
+
+void ASGameModeBase::HandleStartingNewPlayer_Implementation( APlayerController* NewPlayer )
+{
+  Super::HandleStartingNewPlayer_Implementation( NewPlayer );
+
+  ASPlayerState* PS{ NewPlayer->GetPlayerState<ASPlayerState>() };
+  if( PS )
+  {
+    PS->LoadPlayerState( CurrentSaveGame );
   }
 }
 
@@ -236,6 +249,17 @@ void ASGameModeBase::RespawnPlayerElapsed( AController* Controller )
 void ASGameModeBase::WriteSaveGame()
 {
   constexpr int32 playerIndex{ 0 };
+
+
+  for( int32 i = 0; i < GameState->PlayerArray.Num(); i++ )
+  {
+    ASPlayerState* PS{ Cast <ASPlayerState>( GameState->PlayerArray[i] ) };
+    if( PS )
+    {
+      PS->SavePlayerState( CurrentSaveGame );
+      break; // Single player only at this point
+    }
+  }
 
   UGameplayStatics::SaveGameToSlot( CurrentSaveGame, SlotName, playerIndex );
 }

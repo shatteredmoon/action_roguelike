@@ -12,6 +12,7 @@ class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
 class USSaveGame;
+class APlayerController;
 
 
 /**
@@ -83,6 +84,8 @@ public:
   virtual void OnActorKilled( AActor* VictimActor, AActor* Killer );
 
   void StartPlay() override;
+
+  void HandleStartingNewPlayer_Implementation( APlayerController* NewPlayer ) override;
 
   UFUNCTION( Exec )
   void KillAll();
