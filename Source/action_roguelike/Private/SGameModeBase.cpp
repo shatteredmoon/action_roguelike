@@ -12,6 +12,7 @@
 #include "SSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameStateBase.h"
+#include "SGameplayInterface.h"
 
 
 // Cheats are not included in the final build
@@ -261,6 +262,26 @@ void ASGameModeBase::WriteSaveGame()
     }
   }
 
+  CurrentSaveGame->SavedActors.Empty();
+
+  // Iterate all actors
+  for( FActorIterator It{ GetWorld() }; It; ++It )
+  {
+    AActor* Actor{ *It };
+
+    // Only interested in our 'gameplay actors'
+    if( !Actor->Implements<USGameplayInterface>() )
+    {
+      continue;
+    }
+
+    FActorSaveData ActorData;
+    ActorData.ActorName = Actor->GetName();
+    ActorData.Transform = Actor->GetActorTransform();
+
+    CurrentSaveGame->SavedActors.Add( ActorData );
+  }
+
   UGameplayStatics::SaveGameToSlot( CurrentSaveGame, SlotName, playerIndex );
 }
 
@@ -279,6 +300,27 @@ void ASGameModeBase::LoadSaveGame()
     }
 
     UE_LOG( LogTemp, Warning, TEXT( "Loaded SaveGame Data." ) );
+
+    // Iterate all actors
+    for( FActorIterator It{ GetWorld() }; It; ++It )
+    {
+      AActor* Actor{ *It };
+
+      // Only interested in our 'gameplay actors'
+      if( !Actor->Implements<USGameplayInterface>() )
+      {
+        continue;
+      }
+
+      for( FActorSaveData ActorData : CurrentSaveGame->SavedActors )
+      {
+        if( ActorData.ActorName == Actor->GetName() )
+        {
+          Actor->SetActorTransform( ActorData.Transform );
+          break;
+        }
+      }
+    }
   }
   else
   {
