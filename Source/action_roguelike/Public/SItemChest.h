@@ -15,6 +15,8 @@ class ACTION_ROGUELIKE_API ASItemChest : public AActor, public ISGameplayInterfa
 
   void Interact_Implementation( APawn* instigatorPawn );
 
+  void OnActorLoaded_Implementation();
+
 public:
 
   UPROPERTY( EditAnywhere )
@@ -22,7 +24,7 @@ public:
 
 protected:
 
-  UPROPERTY( ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly) // ReplicatedUsing == RepNotify in blueprints
+  UPROPERTY( ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly, SaveGame ) // ReplicatedUsing == RepNotify in blueprints
   bool bLidOpened;
 
   UFUNCTION()

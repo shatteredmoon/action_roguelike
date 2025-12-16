@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameStateBase.h"
 #include "SGameplayInterface.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 
 // Cheats are not included in the final build
@@ -37,8 +38,6 @@ ASGameModeBase::ASGameModeBase()
 void ASGameModeBase::InitGame( const FString& MapName, const FString& Options, FString& ErrorMessage )
 {
   Super::InitGame( MapName, Options, ErrorMessage );
-
-  LoadSaveGame();
 }
 
 
@@ -90,6 +89,8 @@ void ASGameModeBase::StartPlay()
       QueryInstance->GetOnQueryFinishedEvent().AddDynamic( this, &ASGameModeBase::OnBotSpawnQueryCompleted );
     }
   }
+
+  LoadSaveGame();
 }
 
 
@@ -279,6 +280,17 @@ void ASGameModeBase::WriteSaveGame()
     ActorData.ActorName = Actor->GetName();
     ActorData.Transform = Actor->GetActorTransform();
 
+    // Pass the array to fill with data from Actor
+    FMemoryWriter MemWriter( ActorData.ByteData );
+
+    FObjectAndNameAsStringProxyArchive Ar( MemWriter, true );
+
+    // Find only variables with UPROPERTY( SaveGame )
+    Ar.ArIsSaveGame = true;
+
+    // Converts Actor's SaveGame UPROPERTIES into binary array
+    Actor->Serialize( Ar );
+
     CurrentSaveGame->SavedActors.Add( ActorData );
   }
 
@@ -317,6 +329,19 @@ void ASGameModeBase::LoadSaveGame()
         if( ActorData.ActorName == Actor->GetName() )
         {
           Actor->SetActorTransform( ActorData.Transform );
+
+          FMemoryReader MemReader( ActorData.ByteData );
+
+          FObjectAndNameAsStringProxyArchive Ar( MemReader, true );
+
+          // Find only variables with UPROPERTY( SaveGame )
+          Ar.ArIsSaveGame = true;
+
+          // Converts binary array back into actor's variables
+          Actor->Serialize( Ar );
+
+          ISGameplayInterface::Execute_OnActorLoaded( Actor );
+
           break;
         }
       }
