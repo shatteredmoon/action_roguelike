@@ -10,6 +10,9 @@
 class USAction;
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams( FOnActionStateChanged, USActionComponent*, OwningComp, USAction*, Action );
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTION_ROGUELIKE_API USActionComponent : public UActorComponent
 {
@@ -43,7 +46,7 @@ protected:
   UFUNCTION( Server, Reliable )
   void ServerStopAction( AActor* Instigator, FName ActionName );
 
-  UPROPERTY(Replicated)
+  UPROPERTY(BlueprintReadOnly, Replicated)
   TArray<USAction*> Actions;
 
   /* Granted abilities at game start */
@@ -54,6 +57,12 @@ protected:
   void BeginPlay() override;
 
 public:
+
+  UPROPERTY( BlueprintAssignable )
+  FOnActionStateChanged OnActionStarted;
+
+  UPROPERTY( BlueprintAssignable )
+  FOnActionStateChanged OnActionStopped;
 
   bool ReplicateSubobjects( class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags ) override;
 
