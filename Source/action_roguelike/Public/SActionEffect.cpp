@@ -1,5 +1,6 @@
 #include "SActionEffect.h"
 #include "SActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 
 USActionEffect::USActionEffect()
@@ -51,8 +52,13 @@ void USActionEffect::StopAction_Implementation( AActor * Instigator )
 
 float USActionEffect::GetTimeRemaining() const
 {
-  float EndTime = TimeStarted + Duration;
-  return EndTime - GetWorld()->TimeSeconds;
+  if( AGameStateBase *GS{ GetWorld()->GetGameState<AGameStateBase>() } )
+  {
+    const float EndTime{ TimeStarted + Duration };
+    return EndTime - GS->GetServerWorldTimeSeconds();
+  }
+
+  return Duration;
 }
 
 
